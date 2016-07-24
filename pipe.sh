@@ -8,10 +8,10 @@ if [ "$#" -lt "1" ]; then
     exit
 fi
 
-GENOME_DIR=/ifs/res/socci/LUX/ifs/data/bio/Genomes/S.cerevisiae/sacCer2/SGD/20080628/BWA_0.7.5a
+GENOME_DIR=/ifs/res/socci/LUX/ifs/data/bio/Genomes/S.cerevisiae/sacCer2/SGD/20080628
 GENOME_FASTA=$GENOME_DIR/SGD_sacCer2.fa
-GENOME_BWA=$GENOME_DIR/SGD_sacCer2.fa
 GENOME_TAG=SGD_sacCer2
+GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
 
 SAMPLENAME=$1
 shift 1
@@ -34,8 +34,9 @@ for SAMPLEDIR in $SAMPLEDIRS; do
         bsub -o LSF/ -J ${TAG}_1_$BLOCKNUM -We 59 \
             $SDIR/clipAdapterSE.sh $ODIR/$BLOCKNUM $FASTQ
 
+        CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq.gz
         bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" \
-            ls -s $ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq.gz
+            $SDIR/mapSHRiMP_SE.sh $GENOME_INDEX $CLIPFASTQ $SAMPLENAME
 
         BLOCKNUM=$((BLOCKNUM+1))
 
