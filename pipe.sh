@@ -38,7 +38,7 @@ for SAMPLEDIR in $SAMPLEDIRS; do
         mkdir -p $ODIR/$BLOCKNUM
 
         bsub -o LSF/ -J ${TAG}_1_$BLOCKNUM -We 59 \
-            $SDIR/clipAdapterSE.sh $ODIR/$BLOCKNUM $FASTQ
+            $SDIR/clipAdapterSE.sh $ODIR/$BLOCKNUM $FASTQ $SDIR/adapter_TruSeqFull.sh
 
         CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq.gz
 
