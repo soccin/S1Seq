@@ -13,7 +13,7 @@ ADAPTERS=$3
 
 echo "$0"
 echo MINLENGTH=$MINLENGTH
-echo ADAPTERS_1=$ADAPTERS_1
+echo ADAPTER_1=$ADAPTER_1
 
 gzcat $FASTQ | $SDIR/bin/fastx_clipper -a $ADAPTER_1 -n -Q33 \
     -l $MINLENGTH -v -z -o ${ODIR}/${BASE}___CLIP.fastq.gz
