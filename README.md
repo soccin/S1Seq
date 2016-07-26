@@ -1,6 +1,5 @@
 # S1Seq pipeline
 
-Keeney Lab for resection tract mapping. 
+## Keeney Lab pipeline for resection tract mapping. 
 
-PE version using PE-mapper
-
+This version is for Single End (SE) read data. 
