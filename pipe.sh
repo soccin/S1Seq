@@ -10,11 +10,18 @@ fi
 
 RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
 
-GENOME_DIR=/ifs/res/socci/LUX/ifs/data/bio/Genomes/S.cerevisiae/sacCer2/SGD/20080628
-GENOME_FASTA=$GENOME_DIR/SGD_sacCer2.fa
-GENOME_TAG=SGD_sacCer2
+#GENOME_DIR=/ifs/res/socci/LUX/ifs/data/bio/Genomes/S.cerevisiae/sacCer2/SGD/20080628
+#GENOME_FASTA=$GENOME_DIR/SGD_sacCer2.fa
+#GENOME_TAG=SGD_sacCer2
+#GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
+#GENOME_BEDTOOLS=$GENOME_DIR/SGD_sacCer2.genome
+
+GENOME_DIR=/home/socci/Work/Users/KeeneyS/MimitouE/S1Seq/Genomes/SGD_sacCer2+HIS4LEU2
+GENOME_FASTA=$GENOME_DIR/SGD_sacCer2+HIS4LEU2.fa
+GENOME_TAG=SGD_sacCer2+HIS4LEU2
 GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
 GENOME_BEDTOOLS=$GENOME_DIR/SGD_sacCer2.genome
+
 
 SAMPLENAME=$1
 shift 1
