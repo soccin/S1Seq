@@ -20,6 +20,7 @@ if [ ! -e "$SDIR/genomes/$GENOME" ]; then
     exit
 fi
 
+MEMSIZE=4
 source $SDIR/genomes/$GENOME
 
 # Echo genome parameters set
@@ -29,6 +30,7 @@ echo "GENOME_FASTA    = $GENOME_FASTA"
 echo "GENOME_TAG      = $GENOME_TAG"
 echo "GENOME_INDEX    = $GENOME_INDEX"
 echo "GENOME_BEDTOOLS = $GENOME_BEDTOOLS"
+echo "MEMSIZE         = $MEMSIZE"
 
 SAMPLENAME=$1
 shift 1
@@ -56,7 +58,9 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
         CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq.gz
 
-        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 -We 59 \
+        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" \
+            -n 24 -We 59 \
+            -R "rusage[mem=$MEMSIZE]" \
             $SDIR/mapSHRiMP_SE.sh $GENOME_INDEX $CLIPFASTQ $SAMPLENAME
 
         SAM=$(echo $CLIPFASTQ | sed 's/.fastq.gz/___SHR_SE.sam/')
