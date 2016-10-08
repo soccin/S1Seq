@@ -3,25 +3,32 @@
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 if [ "$#" -lt "1" ]; then
-    echo "usage: S1Seq/pipe.sh SAMPLENAME SAMPLEDIR1 [SAMPLEDIR_N]"
+    echo "usage: S1Seq/pipe.sh GENOME SAMPLENAME SAMPLEDIR1 [SAMPLEDIR_N]"
     echo
     exit
 fi
 
 RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
 
-#GENOME_DIR=/ifs/res/socci/LUX/ifs/data/bio/Genomes/S.cerevisiae/sacCer2/SGD/20080628
-#GENOME_FASTA=$GENOME_DIR/SGD_sacCer2.fa
-#GENOME_TAG=SGD_sacCer2
-#GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
-#GENOME_BEDTOOLS=$GENOME_DIR/SGD_sacCer2.genome
+GENOME=$1
+shift 1
 
-GENOME_DIR=/home/socci/Work/Users/KeeneyS/MimitouE/S1Seq/Genomes/SGD_sacCer2+HIS4LEU2
-GENOME_FASTA=$GENOME_DIR/SGD_sacCer2+HIS4LEU2.fa
-GENOME_TAG=SGD_sacCer2+HIS4LEU2
-GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
-GENOME_BEDTOOLS=$GENOME_DIR/SGD_sacCer2.genome
+if [ ! -e "$SDIR/genomes/$GENOME" ]; then
+    echo "Invalid GENOME=[$GENOME]"
+    echo "Valid genomes:"
+    ls -1 $SDIR/genomes
+    exit
+fi
 
+source $SDIR/genomes/$GENOME
+
+# Echo genome parameters set
+
+echo "GENOME_DIR      = $GENOME_DIR"
+echo "GENOME_FASTA    = $GENOME_FASTA"
+echo "GENOME_TAG      = $GENOME_TAG"
+echo "GENOME_INDEX    = $GENOME_INDEX"
+echo "GENOME_BEDTOOLS = $GENOME_BEDTOOLS"
 
 SAMPLENAME=$1
 shift 1
