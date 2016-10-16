@@ -5,5 +5,5 @@ GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
 GENOME_BEDTOOLS=$GENOME_DIR/mouse_mm10.genome
 #
 # Need to reserve more MEM for mouse
-MEMSIZE=32
+MEMSIZE=64
 
