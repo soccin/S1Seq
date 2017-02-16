@@ -40,18 +40,18 @@ for SAMPLEDIR in $SAMPLEDIRS; do
         bsub -o LSF/ -J ${TAG}_1_$BLOCKNUM -We 59 \
             $SDIR/clipAdapterPE.sh $ODIR/$BLOCKNUM $FASTQ
 
-        CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq.gz
+        CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq
 
         bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 -We 59 \
             $SDIR/mapSHRiMP_PE.sh $GENOME_INDEX $CLIPFASTQ $SAMPLENAME
 
-        SAM=$(echo $CLIPFASTQ | sed 's/.fastq.gz/___SHR_SE.sam/')
+        SAM=$(echo $CLIPFASTQ | sed 's/.fastq/___SHR_PE.sam/')
 
         bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=36]" -n 3 -We 59\
-            picard.local SortSam I=$SAM O=${SAM/.sam/.bam} SO=coordinate CREATE_INDEX=true
+            picard.local SortSam I=$SAM O=${SAM/.sam/.bam} SO=queryname CREATE_INDEX=true
 
-#        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
-#            $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
+        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
+            $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
         HITMAPS[$BLOCKNUM]=${SAM/.sam/}
 
@@ -59,8 +59,9 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
     done
 done
+exit
 
-bSync ${TAG}_3_'\d+'
+bSync ${TAG}_4_'\d+'
 
 bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
     picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam CREATE_INDEX=true \
