@@ -60,11 +60,12 @@ for SAMPLEDIR in $SAMPLEDIRS; do
     done
 done
 
-bSync ${TAG}_4_'\d+'
+bSync ${TAG}_3_'\d+'
 
 bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
     picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam CREATE_INDEX=true \
     $(find $ODIR | fgrep .bam | fgrep -v merge.bam | awk '{print "I="$1}')
+
 
 bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 \
     $SDIR/getUniqueMaps.sh $ODIR/${SAMPLENAME}___merge.bam $ODIR/${SAMPLENAME}___merge,unique.bam
