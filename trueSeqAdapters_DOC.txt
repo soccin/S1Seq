@@ -1,0 +1,15 @@
+Illumina TrueSeq adapters
+
+## R1
+# Maximal common  AGATCGGAAGAGC
+# S1Seq           AGATCGGAAGAGC ACACGTCT GAAGTCCAGTCAC
+# BIC Var         AGATCGGAAGAGC ACACGTCT
+# Full (bc1)      AGATCGGAAGAGC ACACGTCT GAACTCCAGTCAC ATCACGATCTCGTATGCCGTCTTCTGCTTG
+# 6bp BC                                               <-BC->
+# 8bp BC                                               <--BC-->
+
+## R2
+# Maximal common  AGATCGGAAGAGC
+# S1Seq           AGATCGGAAGAGC GTCGTGTA GGGAAAGAGTGTA
+# BIC Var         AGATCGGAAGAGC GTCGTGTA
+# DMP             AGATCGGAAGAGC GTCGTGTA GGGAAAGAGTGTA GATCTCGGTGGTCGCCGTATCATT
