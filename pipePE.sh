@@ -59,14 +59,12 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
     done
 done
-exit
 
 bSync ${TAG}_4_'\d+'
 
 bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
     picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam CREATE_INDEX=true \
-    $(find $ODIR | fgrep .bam | fgrep -v merge.bam | awk '{print "I="$1}')
-
+    $(find $ODIR | fgrep .bam | fgrep -v merge.bam | fgrep -v ___UNIQ_PP.bam | awk '{print "I="$1}')
 
 bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 \
     $SDIR/getUniqueMaps.sh $ODIR/${SAMPLENAME}___merge.bam $ODIR/${SAMPLENAME}___merge,unique.bam
@@ -75,9 +73,9 @@ bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
     picard.local CollectAlignmentSummaryMetrics R=$GENOME_FASTA \
     O=$ODIR/${SAMPLENAME}___merge___AS.txt I=$ODIR/${SAMPLENAME}___merge.bam
 
-#bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
-#    $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
-#        $ODIR/${SAMPLENAME}_HITMAP_.Rdata \
-#        $SAMPLENAME \
-#        ${HITMAPS[*]}
+bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
+    $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
+        $ODIR/${SAMPLENAME}_HITMAP_.Rdata \
+        $SAMPLENAME \
+        ${HITMAPS[*]}
 
