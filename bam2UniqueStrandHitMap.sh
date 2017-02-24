@@ -12,25 +12,33 @@ SAMTOOLS=/opt/common/CentOS_6-dev/samtools/samtools-1.3.1/samtools
 # First get unique properly paired reads
 #
 
+# 0x042
+# 0x040 == first pair
+# 0x002 == proper pair
+#
+
 (
     $SAMTOOLS view -H $BAM;
-    $SAMTOOLS view -f2 $BAM| fgrep -w "NH:i:1"
+    $SAMTOOLS view -f 0x042 $BAM| fgrep -w "NH:i:1"
     ) \
-| samtools view -Sb - >${BASE}___UNIQ_PP.bam
+| samtools view -Sb - >${BASE}___UNIQ_R1_PP.bam
+
 
 #
-# NH tag in SHRiMP is number of hits
-# -tag NH puts NH number in col 5
-# $5==1 UNIQUE hits
+# BAM now only have R1 reads in them so just do the normal
+# bamtobed (not bedpe)
+#
+# We have already filter for NH:i:1 but no harm in doing again
+#
 
-$BEDTOOLS bamtobed -bedpe -i ${BASE}___UNIQ_PP.bam \
-    | awk '$9=="+"{print $1,$2,$2+1,$0}' \
+$BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R1_PP.bam \
+    | awk '$5==1 && $6=="+"{print $1,$2,$2+1,$0}' \
     | tr ' ' '\t' \
     | sort -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__PosHM.txt
 
-$BEDTOOLS bamtobed -bedpe -i ${BASE}___UNIQ_PP.bam \
-    | awk '$9=="-"{print $1,$6-1,$6,$0}' \
+$BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R1_PP.bam \
+    | awk '$5==1 && $6=="-"{print $1,$3-1,$3,$0}' \
     | tr ' ' '\t' \
     | sort -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__NegHM.txt
