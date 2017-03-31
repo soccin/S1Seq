@@ -9,37 +9,35 @@ SAMTOOLS=/opt/common/CentOS_6-dev/samtools/samtools-1.3.1/samtools
 
 
 #
-# First get unique properly paired reads
-#
+# Get properly paired reads (0x02)
+# with unique maps (fgrep -w "NH:i:1")
+# and then sort into queryname so bedtools bedpe
+# works
 
-# 0x042
-# 0x040 == first read in pair
-# 0x080 == second read in pair
+#
 # 0x002 == proper pair
 #
 
 (
     $SAMTOOLS view -H $BAM;
-    $SAMTOOLS view -f 0x082 $BAM| fgrep -w "NH:i:1"
-    ) \
-| samtools view -Sb - >${BASE}___UNIQ_R12_PP.bam
-
+    $SAMTOOLS view -f 0x02 $BAM | fgrep -w "NH:i:1";
+) \
+    | samtools view -Sb - \
+    | samtools sort -n - \
+    >${BASE}___UNIQ_R12_PP.bam
 
 #
-# BAM now only have R1 reads in them so just do the normal
-# bamtobed (not bedpe)
-#
-# We have already filter for NH:i:1 but no harm in doing again
+# Use R1 read for + R2 for negative
 #
 
-$BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R12_PP.bam \
-    | awk '$5==1 && $6=="+"{print $1,$2,$2+1,$0}' \
+$BEDTOOLS bamtobed -bedpe -i ${BASE}___UNIQ_R12_PP.bam \
+    | awk '$9=="+"{print $1,$2,$2+1,$0}' \
     | tr ' ' '\t' \
     | sort -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__R12__PosHM.txt
 
-$BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R12_PP.bam \
-    | awk '$5==1 && $6=="-"{print $1,$3-1,$3,$0}' \
+$BEDTOOLS bamtobed -bedpe -i ${BASE}___UNIQ_R12_PP.bam \
+    | awk '$9=="-"{print $4,$6-1,$6,$0}' \
     | tr ' ' '\t' \
     | sort -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__R12__NegHM.txt
