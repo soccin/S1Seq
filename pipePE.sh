@@ -64,6 +64,10 @@ for SAMPLEDIR in $SAMPLEDIRS; do
         bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
             $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
+        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
+            $SDIR/bam2UniqueStrandHitMapR2.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
+
+
         HITMAPS[$BLOCKNUM]=${SAM/.sam/}
 
         BLOCKNUM=$((BLOCKNUM+1))
@@ -75,7 +79,7 @@ bSync ${TAG}_4_'\d+'
 
 bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
     picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam CREATE_INDEX=true \
-    $(find $ODIR | fgrep .bam | fgrep -v merge.bam | fgrep -v ___UNIQ_PP.bam | awk '{print "I="$1}')
+    $(find $ODIR | fgrep ___CLIP___SHR_PE.bam | fgrep -v merge.bam | awk '{print "I="$1}')
 
 bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 \
     $SDIR/getUniqueMaps.sh $ODIR/${SAMPLENAME}___merge.bam $ODIR/${SAMPLENAME}___merge,unique.bam
@@ -90,3 +94,8 @@ bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
         $SAMPLENAME \
         ${HITMAPS[*]}
 
+bsub -o LSF/ -J ${TAG}_8.2 -n 3 -We 59 \
+    $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
+        $ODIR/${SAMPLENAME}_HITMAP_R2.Rdata \
+        $SAMPLENAME \
+        ${HITMAPS[*]/___SHR_PE/___SHR_PE__R2}
