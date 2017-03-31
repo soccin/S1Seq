@@ -88,6 +88,18 @@ bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
     picard.local CollectAlignmentSummaryMetrics R=$GENOME_FASTA \
     O=$ODIR/${SAMPLENAME}___merge___AS.txt I=$ODIR/${SAMPLENAME}___merge.bam
 
+bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+    picard.local CollectInsertSizeMetrics \
+    I=$ODIR/${SAMPLENAME}___merge.bam \
+    O=$ODIR/${SAMPLENAME}___merge___INS.txt \
+    H=$ODIR/${SAMPLENAME}___merge___INS.pdf
+
+bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+    picard.local MarkDuplicates \
+    I=$ODIR/${SAMPLENAME}___merge.bam \
+    O=$ODIR/${SAMPLENAME}___merge___MD.bam \
+    H=$ODIR/${SAMPLENAME}___merge___MD.txt
+
 bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
     $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
         $ODIR/${SAMPLENAME}_HITMAP_.Rdata \
