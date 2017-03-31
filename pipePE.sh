@@ -98,7 +98,7 @@ bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
     picard.local MarkDuplicates \
     I=$ODIR/${SAMPLENAME}___merge.bam \
     O=$ODIR/${SAMPLENAME}___merge___MD.bam \
-    H=$ODIR/${SAMPLENAME}___merge___MD.txt
+    M=$ODIR/${SAMPLENAME}___merge___MD.txt
 
 bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
     $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
