@@ -59,7 +59,13 @@ for SAMPLEDIR in $SAMPLEDIRS; do
         SAM=$(echo $CLIPFASTQ | sed 's/.fastq/___SHR_PE.sam/')
 
         bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=36]" -n 3 -We 59\
-            picard.local SortSam I=$SAM O=${SAM/.sam/.bam} SO=queryname CREATE_INDEX=true
+            picard.local AddOrReplaceReadGroups \
+                SO=queryname \
+                I=$SAM O=${SAM/.sam/.bam} \
+                SM=$SAMPLENAME \
+                LB=$SAMPLENAME \
+                PU=$SAMPLENAME \
+                PL=illumina
 
         bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
             $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
