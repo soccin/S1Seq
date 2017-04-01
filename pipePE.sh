@@ -84,7 +84,7 @@ done
 bSync ${TAG}_4_'\d+'
 
 bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
-    picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam CREATE_INDEX=true \
+    picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam SO=coordinate CREATE_INDEX=true \
     $(find $ODIR | fgrep ___CLIP___SHR_PE.bam | fgrep -v merge.bam | awk '{print "I="$1}')
 
 bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 \
