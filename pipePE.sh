@@ -100,8 +100,8 @@ bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
     O=$ODIR/${SAMPLENAME}___merge___INS.txt \
     H=$ODIR/${SAMPLENAME}___merge___INS.pdf
 
-bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
-    picard.local MarkDuplicates \
+bsub -o LSF/ -J ${TAG}_7.1 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+    picard.local MarkDuplicates REMOVE_DUPLICATES=true \
     I=$ODIR/${SAMPLENAME}___merge.bam \
     O=$ODIR/${SAMPLENAME}___merge___MD.bam \
     M=$ODIR/${SAMPLENAME}___merge___MD.txt
@@ -117,3 +117,12 @@ bsub -o LSF/ -J ${TAG}_8.2 -n 3 -We 59 \
         $ODIR/${SAMPLENAME}_HITMAP_R2.Rdata \
         $SAMPLENAME \
         ${HITMAPS[*]/___SHR_PE/___SHR_PE__R2}
+
+bsub -o LSF/ -J ${TAG}_9 -w "post_done(${TAG}_7.1)" -n 3 -We 59 \
+    $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS $ODIR/${SAMPLENAME}___merge___MD.bam
+
+bsub -o LSF/ -J ${TAG}_A -w "post_done(${TAG}_9)" -We 59 \
+    $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
+        $ODIR/${SAMPLENAME}_HITMAP_MarkDup.Rdata \
+        $SAMPLENAME \
+        $ODIR/${SAMPLENAME}___merge___MD

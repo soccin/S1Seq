@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Do you really want to run this???"
+echo "Maybe want to run pipePE.sh instead" 
+exit -1
+
 SDIR="$( cd "$( dirname "$0" )" && pwd )"
 
 if [ "$#" -lt "1" ]; then
