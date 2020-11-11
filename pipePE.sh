@@ -9,9 +9,8 @@ if [ "$#" -lt "1" ]; then
 fi
 
 RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
-MEMSIZE=8
-#LSF_WARG="-We 59" # No longer used on LUNA
-LSF_WARG=""
+MEMSIZE=1
+LSF_WARG="-W 59"
 
 GENOME=$1
 shift 1
@@ -62,7 +61,7 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
         SAM=$(echo $CLIPFASTQ | sed 's/.fastq/___SHR_PE.sam/')
 
-        bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=36]" -n 3 $LSF_WARG\
+        bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=12]" -n 3 $LSF_WARG\
             picard.local AddOrReplaceReadGroups \
                 SO=queryname \
                 I=$SAM O=${SAM/.sam/.bam} \
@@ -87,24 +86,24 @@ done
 
 bSync ${TAG}_4_'\d+'
 
-bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=36]" \
+bsub -o LSF/ -J ${TAG}_5 -n 3 -R "rusage[mem=12]" $LSF_WARG \
     picard.local MergeSamFiles O=$ODIR/${SAMPLENAME}___merge.bam SO=coordinate CREATE_INDEX=true \
     $(find $ODIR | fgrep ___CLIP___SHR_PE.bam | fgrep -v merge.bam | awk '{print "I="$1}')
 
-bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 \
+bsub -o LSF/ -J ${TAG}_6 -w "post_done(${TAG}_5)" -n 3 $LSF_WARG \
     $SDIR/getUniqueMaps.sh $ODIR/${SAMPLENAME}___merge.bam $ODIR/${SAMPLENAME}___merge,unique.bam
 
-bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=12]" $LSF_WARG \
     picard.local CollectAlignmentSummaryMetrics R=$GENOME_FASTA \
     O=$ODIR/${SAMPLENAME}___merge___AS.txt I=$ODIR/${SAMPLENAME}___merge.bam
 
-bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+bsub -o LSF/ -J ${TAG}_7 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=12]" $LSF_WARG \
     picard.local CollectInsertSizeMetrics \
     I=$ODIR/${SAMPLENAME}___merge.bam \
     O=$ODIR/${SAMPLENAME}___merge___INS.txt \
     H=$ODIR/${SAMPLENAME}___merge___INS.pdf
 
-bsub -o LSF/ -J ${TAG}_7.1 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
+bsub -o LSF/ -J ${TAG}_7.1 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=12]" $LSF_WARG \
     picard.local MarkDuplicates REMOVE_DUPLICATES=true \
     I=$ODIR/${SAMPLENAME}___merge.bam \
     O=$ODIR/${SAMPLENAME}___merge___MD.bam \
