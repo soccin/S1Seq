@@ -9,6 +9,9 @@ if [ "$#" -lt "1" ]; then
 fi
 
 RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
+MEMSIZE=8
+#LSF_WARG="-We 59" # No longer used on LUNA
+LSF_WARG=""
 
 GENOME=$1
 shift 1
@@ -48,17 +51,18 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
         mkdir -p $ODIR/$BLOCKNUM
 
-        bsub -o LSF/ -J ${TAG}_1_$BLOCKNUM -We 59 \
+        bsub -o LSF/ -J ${TAG}_1_$BLOCKNUM $LSF_WARG \
             $SDIR/clipAdapterPE.sh $ODIR/$BLOCKNUM $FASTQ
 
         CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq
 
-        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 -We 59 \
+        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 $LSF_WARG \
+            -R "rusage[mem=$MEMSIZE]" \
             $SDIR/mapSHRiMP_PE.sh $GENOME_INDEX $CLIPFASTQ $SAMPLENAME
 
         SAM=$(echo $CLIPFASTQ | sed 's/.fastq/___SHR_PE.sam/')
 
-        bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=36]" -n 3 -We 59\
+        bsub -o LSF/ -J ${TAG}_3_$BLOCKNUM -w "post_done(${TAG}_2_$BLOCKNUM)" -R "rusage[mem=36]" -n 3 $LSF_WARG\
             picard.local AddOrReplaceReadGroups \
                 SO=queryname \
                 I=$SAM O=${SAM/.sam/.bam} \
@@ -67,10 +71,10 @@ for SAMPLEDIR in $SAMPLEDIRS; do
                 PU=$SAMPLENAME \
                 PL=illumina
 
-        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
+        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG \
             $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
-        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 -We 59 \
+        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG \
             $SDIR/bam2UniqueStrandHitMapR2.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
 
@@ -106,22 +110,22 @@ bsub -o LSF/ -J ${TAG}_7.1 -w "post_done(${TAG}_5)" -n 3 -R "rusage[mem=36]" \
     O=$ODIR/${SAMPLENAME}___merge___MD.bam \
     M=$ODIR/${SAMPLENAME}___merge___MD.txt
 
-bsub -o LSF/ -J ${TAG}_8 -n 3 -We 59 \
+bsub -o LSF/ -J ${TAG}_8 -n 3 $LSF_WARG \
     $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
         $ODIR/${SAMPLENAME}_HITMAP_.Rdata \
         $SAMPLENAME \
         ${HITMAPS[*]}
 
-bsub -o LSF/ -J ${TAG}_8.2 -n 3 -We 59 \
+bsub -o LSF/ -J ${TAG}_8.2 -n 3 $LSF_WARG \
     $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
         $ODIR/${SAMPLENAME}_HITMAP_R2.Rdata \
         $SAMPLENAME \
         ${HITMAPS[*]/___SHR_PE/___SHR_PE__R2}
 
-bsub -o LSF/ -J ${TAG}_9 -w "post_done(${TAG}_7.1)" -n 3 -We 59 \
+bsub -o LSF/ -J ${TAG}_9 -w "post_done(${TAG}_7.1)" -n 3 $LSF_WARG \
     $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS $ODIR/${SAMPLENAME}___merge___MD.bam
 
-bsub -o LSF/ -J ${TAG}_A -w "post_done(${TAG}_9)" -We 59 \
+bsub -o LSF/ -J ${TAG}_A -w "post_done(${TAG}_9)" $LSF_WARG \
     $RSCRIPT --no-save $SDIR/mergeHitMaps.R \
         $ODIR/${SAMPLENAME}_HITMAP_MarkDup.Rdata \
         $SAMPLENAME \
