@@ -2,7 +2,7 @@ GENOME_DIR=/ifs/work/socci/Depot/Genomes/M.musculus/ucsc/mm10
 GENOME_FASTA=$GENOME_DIR/mouse_mm10.fa
 GENOME_TAG=mouse_mm10
 GENOME_INDEX=$GENOME_DIR/SHRiMP/DNA/$GENOME_TAG-ls
-GENOME_BEDTOOLS=$GENOME_DIR/mouse_mm10.genome
+GENOME_BEDTOOLS=$GENOME_DIR/mouse_mm10_FULL.genome
 #
 # Need to reserve more MEM for mouse
 MEMSIZE=3
