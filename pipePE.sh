@@ -11,6 +11,7 @@ fi
 RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
 MEMSIZE=1
 LSF_WARG="-W 59"
+LSF_WARG_LONG="-W 359"
 
 GENOME=$1
 shift 1
@@ -55,7 +56,7 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
         CLIPFASTQ=$ODIR/$BLOCKNUM/$(basename $FASTQ | sed 's/.fastq.gz//')___CLIP.fastq
 
-        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 $LSF_WARG \
+        bsub -o LSF/ -J ${TAG}_2_$BLOCKNUM -w "post_done(${TAG}_1_$BLOCKNUM)" -n 24 $LSF_WARG_LONG \
             -R "rusage[mem=$MEMSIZE]" \
             $SDIR/mapSHRiMP_PE.sh $GENOME_INDEX $CLIPFASTQ $SAMPLENAME
 
@@ -70,10 +71,10 @@ for SAMPLEDIR in $SAMPLEDIRS; do
                 PU=$SAMPLENAME \
                 PL=illumina
 
-        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG \
+        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG_LONG \
             $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
-        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG \
+        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG_LONG \
             $SDIR/bam2UniqueStrandHitMapR2.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
 
