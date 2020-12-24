@@ -4,8 +4,8 @@ BAM=$2
 BASE=${BAM%%.bam}
 echo $BASE, $BAM
 
-BEDTOOLS=/opt/common/CentOS_6-dev/bedtools/bedtools-2.25.0/bin/bedtools
-SAMTOOLS=/opt/common/CentOS_6-dev/samtools/samtools-1.3.1/samtools
+BEDTOOLS=/opt/common/CentOS_7/bedtools/bedtools-2.27.1/bin/bedtools
+SAMTOOLS=/opt/common/CentOS_7/samtools/samtools-1.9/bin/samtools
 
 
 #

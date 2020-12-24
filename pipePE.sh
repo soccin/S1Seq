@@ -8,7 +8,9 @@ if [ "$#" -lt "1" ]; then
     exit
 fi
 
-RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
+#RSCRIPT=/opt/common/CentOS_6-dev/R/R-3.2.2/bin/Rscript
+RSCRIPT=/opt/common/CentOS_7/R/R-3.6.1/bin/Rscript
+
 MEMSIZE=1
 LSF_WARG="-W 59"
 LSF_WARG_LONG="-W 359"

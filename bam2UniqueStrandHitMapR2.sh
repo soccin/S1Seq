@@ -4,10 +4,6 @@ BAM=$2
 BASE=${BAM%%.bam}
 echo $BASE, $BAM
 
-BEDTOOLS=/opt/common/CentOS_6-dev/bedtools/bedtools-2.25.0/bin/bedtools
-SAMTOOLS=/opt/common/CentOS_6-dev/samtools/samtools-1.3.1/samtools
-
-
 #
 # First get unique properly paired reads
 #
