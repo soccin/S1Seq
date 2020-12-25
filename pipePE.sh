@@ -73,10 +73,10 @@ for SAMPLEDIR in $SAMPLEDIRS; do
                 PU=$SAMPLENAME \
                 PL=illumina
 
-        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG_LONG \
+        bsub -o LSF/ -J ${TAG}_4_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 5 $LSF_WARG_LONG \
             $SDIR/bam2UniqueStrandHitMap.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
-        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 3 $LSF_WARG_LONG \
+        bsub -o LSF/ -J ${TAG}_4_2_$BLOCKNUM -w "post_done(${TAG}_3_$BLOCKNUM)" -n 5 $LSF_WARG_LONG \
             $SDIR/bam2UniqueStrandHitMapR2.sh $GENOME_BEDTOOLS ${SAM/.sam/.bam}
 
 
@@ -86,6 +86,11 @@ for SAMPLEDIR in $SAMPLEDIRS; do
 
     done
 done
+
+echo =========
+echo HITMAPS
+echo $HITMAPS
+echo
 
 bSync ${TAG}_4_'\d+'
 
