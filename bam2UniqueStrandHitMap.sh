@@ -40,7 +40,8 @@ $BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R1_PP.bam \
     | awk '$5==1 && $6=="+"{print $1,$2,$2+1,$0}' \
     | tr ' ' '\t' \
     | sort -S 4g -k1,1V -k2,2n \
-    | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__PosHM.txt
+    | $BEDTOOLS genomecov -i - -g $GENOME -d \
+    | gzip - >${BASE}__PosHM.txt.gz
 
 echo 4 $(date)
 
@@ -48,7 +49,8 @@ $BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R1_PP.bam \
     | awk '$5==1 && $6=="-"{print $1,$3-1,$3,$0}' \
     | tr ' ' '\t' \
     | sort -S 4g -k1,1V -k2,2n \
-    | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__NegHM.txt
+    | $BEDTOOLS genomecov -i - -g $GENOME -d \
+    | gzip - >${BASE}__NegHM.txt.gz
 
 echo 5 $(date)
 
