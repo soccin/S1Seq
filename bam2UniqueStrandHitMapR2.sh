@@ -18,12 +18,15 @@ SAMTOOLS=/opt/common/CentOS_7/samtools/samtools-1.9/bin/samtools
 # 0x002 == proper pair
 #
 
+echo 1 $(date)
+
 (
     $SAMTOOLS view -H $BAM;
     $SAMTOOLS view -f 0x082 $BAM| fgrep -w "NH:i:1"
     ) \
 | samtools view -Sb - >${BASE}___UNIQ_R2_PP.bam
 
+echo 2 $(date)
 
 #
 # BAM now only have R1 reads in them so just do the normal
@@ -32,15 +35,20 @@ SAMTOOLS=/opt/common/CentOS_7/samtools/samtools-1.9/bin/samtools
 # We have already filter for NH:i:1 but no harm in doing again
 #
 
+echo 3 $(date)
+
 $BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R2_PP.bam \
     | awk '$5==1 && $6=="+"{print $1,$2,$2+1,$0}' \
     | tr ' ' '\t' \
-    | sort -k1,1V -k2,2n \
+    | sort -S 4g -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__R2__PosHM.txt
+
+echo 4 $(date)
 
 $BEDTOOLS bamtobed -tag NH -i ${BASE}___UNIQ_R2_PP.bam \
     | awk '$5==1 && $6=="-"{print $1,$3-1,$3,$0}' \
     | tr ' ' '\t' \
-    | sort -k1,1V -k2,2n \
+    | sort -S 4g -k1,1V -k2,2n \
     | $BEDTOOLS genomecov -i - -g $GENOME -d >${BASE}__R2__NegHM.txt
 
+echo 5 $(date)
